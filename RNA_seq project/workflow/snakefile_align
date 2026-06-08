@@ -5,14 +5,13 @@ SAMPLES = list(config["samples"].keys())
 rule all:
     input:
         expand(
-            "results/alignment/{sample}.sam",
+            "results/bam/{sample}_sorted.bam.bai",
             sample=SAMPLES
         )
 
 rule align_reads:
     input:
-        fastq="results/trimmed/{sample}_trimmed.fastq.gz",
-        index="index/ecoli_index.1.ht2"
+        "results/trimmed/{sample}_trimmed.fastq.gz"
 
     output:
         "results/alignment/{sample}.sam"
@@ -20,14 +19,51 @@ rule align_reads:
     log:
         "logs/hisat2_{sample}.log"
 
-    threads: 1
- 
     shell:
         """
+        mkdir -p results/alignment
+
         hisat2 \
-        -p {threads} \
         -x index/ecoli_index \
-        -U {input.fastq} \
+        -U {input} \
         -S {output} \
-        2> {log}
+        > {log} 2>&1
+        """
+
+rule sam_to_bam:
+    input:
+        "results/alignment/{sample}.sam"
+
+    output:
+        "results/bam/{sample}.bam"
+
+    shell:
+        """
+        mkdir -p results/bam
+
+        samtools view -bS {input} > {output}
+        """
+
+rule sort_bam:
+    input:
+        "results/bam/{sample}.bam"
+
+    output:
+        "results/bam/{sample}_sorted.bam"
+
+    shell:
+        """
+        samtools sort {input} -o {output}
+        """
+
+rule index_bam:
+    input:
+        "results/bam/{sample}_sorted.bam"
+
+    output:
+        "results/bam/{sample}_sorted.bam.bai"
+
+    shell:
+        """
+        samtools index {input}
         """
