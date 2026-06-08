@@ -1,0 +1,13 @@
+samples:
+  control1: "data/control1.fastq.gz"
+  control2: "data/control2.fastq.gz"
+  control3: "data/control3.fastq.gz"
+
+
+  treated1: "data/treated1.fastq.gz"
+  treated2: "data/treated2.fastq.gz"
+  treated3: "data/treated3.fastq.gz"
+
+reference:
+  genome: "reference/GCF_000005845.2_ASM584v2_genomic.fna"
+  annotation: "reference/genomic.gtf"

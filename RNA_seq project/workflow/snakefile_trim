@@ -1,0 +1,31 @@
+
+
+configfile: "config/config.yaml"
+
+SAMPLES = list(config["samples"].keys())
+
+rule all:
+    input:
+        expand("results/trimmed/{s}_trimmed.fastq.gz", s = SAMPLES)
+   
+
+rule trim_reads:
+    input:
+        lambda wildcards: config["samples"][wildcards.sample]
+
+    output:
+        "results/trimmed/{sample}_trimmed.fastq.gz"
+
+    log:
+        "logs/trimmomatic_{sample}.log"
+
+    shell:
+        """
+        mkdir -p results/trimmed
+
+        trimmomatic SE -phred33 \
+        {input} \
+        {output} \
+        LEADING:3 TRAILING:3 SLIDINGWINDOW:4:20 MINLEN:36 \
+        > {log} 2>&1
+        """

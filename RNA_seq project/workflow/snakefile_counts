@@ -1,0 +1,31 @@
+configfile: "config/config.yaml"
+
+SAMPLES = list(config["samples"].keys())
+
+rule all:
+    input:
+        "results/counts/gene_counts.txt"
+
+rule featurecounts:
+    input:
+        expand(
+            "results/bam/{sample}_sorted.bam",
+            sample=SAMPLES
+        )
+
+    output:
+        "results/counts/gene_counts.txt"
+
+    log:
+        "logs/featurecounts.log"
+
+    shell:
+        """
+        mkdir -p results/counts
+
+        featureCounts \
+        -a reference/genomic.gtf \
+        -o {output} \
+        {input} \
+        > {log} 2>&1
+        """

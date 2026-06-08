@@ -1,0 +1,29 @@
+configfile: "config/config.yaml"
+
+SAMPLES = list(config["samples"].keys())
+
+rule all:
+    input:
+        expand(
+            "results/fastqc_trimmed/{sample}_trimmed_fastqc.html",
+            sample=SAMPLES
+        )
+
+rule fastqc_trimmed:
+    input:
+        "results/trimmed/{sample}_trimmed.fastq.gz"
+
+    output:
+        "results/fastqc_trimmed/{sample}_trimmed_fastqc.html"
+
+    log:
+        "logs/fastqc_trimmed_{sample}.log"
+
+    shell:
+        """
+        mkdir -p results/fastqc_trimmed
+
+        fastqc {input} \
+        -o results/fastqc_trimmed \
+        > {log} 2>&1
+        """

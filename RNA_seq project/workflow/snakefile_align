@@ -1,0 +1,33 @@
+configfile: "config/config.yaml"
+
+SAMPLES = list(config["samples"].keys())
+
+rule all:
+    input:
+        expand(
+            "results/alignment/{sample}.sam",
+            sample=SAMPLES
+        )
+
+rule align_reads:
+    input:
+        fastq="results/trimmed/{sample}_trimmed.fastq.gz",
+        index="index/ecoli_index.1.ht2"
+
+    output:
+        "results/alignment/{sample}.sam"
+
+    log:
+        "logs/hisat2_{sample}.log"
+
+    threads: 1
+ 
+    shell:
+        """
+        hisat2 \
+        -p {threads} \
+        -x index/ecoli_index \
+        -U {input.fastq} \
+        -S {output} \
+        2> {log}
+        """
