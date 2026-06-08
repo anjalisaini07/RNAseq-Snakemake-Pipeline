@@ -1,3 +1,5 @@
+# Example featureCounts workflow rule
+# Actual execution performed in Galaxy
 configfile: "config/config.yaml"
 
 SAMPLES = list(config["samples"].keys())
